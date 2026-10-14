@@ -1,27 +1,20 @@
-# Installer Launcher (Windows x64)
+# Installer Launcher — cloud build
 
-This is a small Windows GUI launcher that lets you browse for an `.exe` or `.msi` and launch it.
+This project uses GitHub Actions to compile a standalone Windows x64 EXE in the cloud. You do not need to install .NET on your office laptop.
 
-## Build the standalone EXE on Windows
+## Build steps
 
-1. Install the .NET 8 SDK for Windows x64 from:
-   https://dotnet.microsoft.com/download/dotnet/8.0
-2. Extract this project folder.
-3. Open PowerShell in the folder containing `InstallerLauncher.csproj`.
-4. Run:
+1. Sign in to GitHub and create a **private** repository, for example `installer-launcher`.
+2. Upload the contents of this folder to the repository root. Keep the `.github/workflows/build.yml` path intact.
+3. Open the repository's **Actions** tab and enable Actions if asked.
+4. Select **Build Windows EXE** and click **Run workflow** (or push/commit the files to `main`).
+5. Open the completed workflow run. Under **Artifacts**, download `InstallerLauncher-windows-x64`.
+6. Extract the downloaded artifact; it contains `InstallerLauncher.exe`.
 
-```powershell
-dotnet publish -c Release
-```
+## What the app does
 
-The standalone executable will be created at:
+It provides a file picker for `.exe` and `.msi` installers and starts the selected installer through standard Windows process-launch mechanisms.
 
-`bin\Release\net8.0-windows\win-x64\publish\InstallerLauncher.exe`
+## Security limitation
 
-Copy that EXE wherever you need it for testing.
-
-## Important security note
-
-This launcher does not bypass Windows UAC or company IT controls, and it does not grant itself administrator rights. It starts the selected installer using normal Windows mechanisms. Whether the installer runs elevated depends on the installer manifest, Windows policy, and your organization's approved self-service portal configuration.
-
-Only run installers approved by your IT team.
+This launcher does not bypass UAC, company controls, or endpoint management. It cannot grant itself administrator rights. Elevation depends on the installer and your organization's approved self-service portal policy. Use only software approved by your IT team.

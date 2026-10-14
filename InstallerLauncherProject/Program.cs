@@ -29,12 +29,7 @@ namespace InstallerLauncher
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
 
-            var label = new Label
-            {
-                Text = "Select an installer (.exe or .msi):",
-                Left = 18, Top = 20, Width = 400, Height = 24
-            };
-            Controls.Add(label);
+            Controls.Add(new Label { Text = "Select an installer (.exe or .msi):", Left = 18, Top = 20, Width = 400, Height = 24 });
 
             pathBox.Left = 18;
             pathBox.Top = 52;
@@ -42,19 +37,11 @@ namespace InstallerLauncher
             pathBox.ReadOnly = true;
             Controls.Add(pathBox);
 
-            var browse = new Button
-            {
-                Text = "Browse...",
-                Left = 530, Top = 49, Width = 110, Height = 30
-            };
+            var browse = new Button { Text = "Browse...", Left = 530, Top = 49, Width = 110, Height = 30 };
             browse.Click += Browse_Click;
             Controls.Add(browse);
 
-            var launch = new Button
-            {
-                Text = "Launch Installer",
-                Left = 18, Top = 100, Width = 160, Height = 38
-            };
+            var launch = new Button { Text = "Launch Installer", Left = 18, Top = 100, Width = 160, Height = 38 };
             launch.Click += Launch_Click;
             Controls.Add(launch);
 
@@ -80,8 +67,8 @@ namespace InstallerLauncher
                 string ext = Path.GetExtension(dialog.FileName).ToLowerInvariant();
                 if (ext != ".exe" && ext != ".msi")
                 {
-                    MessageBox.Show(this, "Please select an .exe or .msi installer.",
-                        "Unsupported file", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select an .exe or .msi installer.", "Unsupported file",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -93,11 +80,10 @@ namespace InstallerLauncher
         private void Launch_Click(object? sender, EventArgs e)
         {
             string file = pathBox.Text.Trim();
-
             if (string.IsNullOrWhiteSpace(file) || !File.Exists(file))
             {
-                MessageBox.Show(this, "Please select an existing .exe or .msi file.",
-                    "No installer selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "Please select an existing .exe or .msi file.", "No installer selected",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -107,11 +93,10 @@ namespace InstallerLauncher
                 ProcessStartInfo psi;
                 if (ext == ".msi")
                 {
-                    // Launch MSI via Windows Installer. Elevation is governed by Windows and IT policy.
                     psi = new ProcessStartInfo
                     {
                         FileName = "msiexec.exe",
-                        Arguments = "/i " + Quote(file),
+                        Arguments = "/i \"" + file.Replace("\"", "\\\"") + "\"",
                         UseShellExecute = true
                     };
                 }
@@ -126,8 +111,8 @@ namespace InstallerLauncher
                 }
                 else
                 {
-                    MessageBox.Show(this, "Only .exe and .msi files are supported.",
-                        "Unsupported file", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Only .exe and .msi files are supported.", "Unsupported file",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -137,11 +122,9 @@ namespace InstallerLauncher
             catch (Exception ex)
             {
                 status.Text = "Launch failed.";
-                MessageBox.Show(this, "Could not launch the installer:\r\n" + ex.Message,
-                    "Launch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, "Could not launch the installer:\r\n" + ex.Message, "Launch error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private static string Quote(string value) => "\"" + value.Replace("\"", "\\\"") + "\"";
     }
 }
