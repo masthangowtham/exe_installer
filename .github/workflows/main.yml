@@ -16,11 +16,28 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Build standalone application
-        run: dotnet publish InstallerLauncher.csproj -c Release -r win-x64 --self-contained true
+      - name: Find and build project
+        shell: pwsh
+        run: |
+          $project = Get-ChildItem -Path . -Recurse -Filter InstallerLauncher.csproj |
+            Select-Object -First 1
+
+          if (-not $project) {
+            Write-Error "InstallerLauncher.csproj not found. Upload the project source files."
+            exit 1
+          }
+
+          Write-Host "Building project: $($project.FullName)"
+
+          dotnet publish $project.FullName `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -o "$env:GITHUB_WORKSPACE\publish"
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: InstallerLauncher-windows-x64
-          path: bin/Release/net8.0-windows/win-x64/publish/InstallerLauncher.exe
+          path: publish/InstallerLauncher.exe
+          if-no-files-found: error
